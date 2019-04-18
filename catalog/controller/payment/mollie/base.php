@@ -434,13 +434,14 @@ class ControllerPaymentMollieBase extends Controller
                 $orderLineTotal += $line['totalAmount']['value'];
             }
             
-            if(($orderTotal > $orderLineTotal) && (number_format(($orderTotal - $orderLineTotal), 2, '.', '') == 0.01)) {
+            $difference = number_format(($orderTotal - $orderLineTotal), 2, '.', '');
+            if(($orderTotal > $orderLineTotal) && $difference <= 0.50) {
                 $lineForDiscount[] = array(
                     'type'          =>  'discount',
                     'name'          =>  $this->formatText($this->language->get("roundoff_description")),
                     'quantity'      =>  1,
-                    'unitPrice'     =>  ["currency" => $currency, "value" => "0.01"],
-                    'totalAmount'   =>  ["currency" => $currency, "value" => "0.01"],
+                    'unitPrice'     =>  ["currency" => $currency, "value" => (string)$difference],
+                    'totalAmount'   =>  ["currency" => $currency, "value" => (string)$difference],
                     'vatRate'       =>  "0",
                     'vatAmount'     =>  ["currency" => $currency, "value" => "0.00"]
                 );
@@ -448,13 +449,13 @@ class ControllerPaymentMollieBase extends Controller
                 $lines = array_merge($lines, $lineForDiscount);
             }
 
-            if(($orderTotal < $orderLineTotal) && (number_format(($orderLineTotal - $orderTotal), 2, '.', '') == 0.01)) {
+            if(($orderTotal < $orderLineTotal) && $difference <= 0.50) {
                 $lineForSurcharge[] = array(
                     'type'          =>  'surcharge',
                     'name'          =>  $this->formatText($this->language->get("roundoff_description")),
                     'quantity'      =>  1,
-                    'unitPrice'     =>  ["currency" => $currency, "value" => "-0.01"],
-                    'totalAmount'   =>  ["currency" => $currency, "value" => "-0.01"],
+                    'unitPrice'     =>  ["currency" => $currency, "value" => (string)$difference],
+                    'totalAmount'   =>  ["currency" => $currency, "value" => (string)$difference],
                     'vatRate'       =>  "0",
                     'vatAmount'     =>  ["currency" => $currency, "value" => "0.00"]
                 );
